@@ -1,0 +1,262 @@
+{# workplace/templates/workpalce/new_schema.html #}
+{% extends 'base.html' %}{% load static %}{% load custom_filters %}
+
+{% block title %}New schema{% endblock %}
+
+{% block body %}
+    {% include 'nav.html' %}
+    {# Form new schema #}
+    <form id="form_new" class="w-75 mx-lg-5 mx-auto d-flex flex-column mt-5"
+          method="post"
+            {% if is_edit %}
+          action="{% url 'submit_edit_schema' schema.pk %}"
+            {% else %}
+          action="{% url 'submit_new_schema' %}"
+            {% endif %}
+    > {% csrf_token %}
+        {# New schema Title & Button #}
+        <div class="d-flex flex-row mb-3">
+            {# New schema title #}
+            <span class="mr-auto me-auto h4">New schema</span>
+            {# Submit button #}
+            <button class="btn btn-primary"
+                    type="submit">
+                Submit
+            </button>
+        </div>
+        {# New schema inputs #}
+        <div class="w-50">
+            {# Name label #}
+            <label class="form-label w-100">
+                Name
+            </label>
+            {# Name input text #}
+            <input class="form-control w-100 mb-3"
+                   type="text"
+                   id="inputSchemaName"
+                   name="schema_name"
+                   value="{% if is_edit %}{{ schema.schema_name }}{% endif %}"
+                   required>
+            {# Column separator label #}
+            <label class="form-label w-100">
+                Column separator
+            </label>
+            {# Column separator input select #}
+            <div class="input-group mb-3 w-100">
+                <select class="custom-select" id="inputColumnSeparator" name="column_separator">
+                    {% for separator in schema.CHOISES_COLUMN_SEPARATOR %}
+                        <option {% if separator|first == schema.column_separator %}selected{% endif %}
+                                value="{{ separator|first }}">
+                            {{ separator|cap_choise_val }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {# String character label #}
+            <label class="form-label w-100">
+                String character
+            </label>
+            {# String character input select #}
+            <div class="input-group mb-3 w-100">
+                <select class="custom-select" id="inputStringCharacter" name="string_character">
+                    {% for separator in schema.CHOISES_STRING_CHARACTER %}
+                        <option {% if separator|first == schema.string_character %}selected{% endif %}
+                                {% if separator|first == 'double_quote' %}
+                                value='{{ separator|first }}'
+                                {% else %}
+                                value="{{ separator|first }}"
+                                {% endif %}
+                        >
+                            {{ separator|cap_choise_val }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        {# Schema columns title #}
+        <div class="content pt-4 pl-3 d-flex flex-column w-100 mb-3">
+            <div class="d-flex flex-row pb-0">
+                <span class=" lh-sm me-auto h4">Schema columns</span>
+            </div>
+        </div>
+        {# Schema columns inputs #}
+        <div id="formSend" class="w-100 pl-3">
+            {# Column Generator #}
+            {% for column in columns %}
+                <div id="columnRow" class="form-row new-col">
+                    {# Name input #}
+                    <div class="form-group col-md-4">
+                        <label>Column name</label>
+                        <input type="text" class="form-control" id="inputColumnName" name="column[][name]"
+                               value="{{ column.column_name }}"
+                               required>
+                    </div>
+                    {# Type select #}
+                    <div class="form-group col-md-3">
+                        <label>Type</label>
+                        <div class="input-group">
+                            <select class="custom-select" id="inputColumnType" name="column[][type]" required>
+                                {% for type in column.CHOISES_COLUMN_TYPES %}
+                                    <option {% if type|first == column.column_type %}selected{% endif %}
+                                            value="{{ type|first }}">
+                                        {{ type|last }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {# Range input. Visible only for Integer #}
+                    {# From input #}
+                    <div class="form-group col-md-1 {% if column.column_type != 'integer' %}invisible{% endif %}">
+                        <label>From</label>
+                        <input type="text" class="form-control" id="inputColumnRangeFrom" name="column[][from]"
+                               pattern="\d*"
+                               value="{{ column.column_from }}" required>
+                    </div>
+                    {# To input #}
+                    <div class="form-group col-md-1 {% if column.column_type != 'integer' %}invisible{% endif %}">
+                        <label>To</label>
+                        <input type="text" class="form-control" id="inputColumnRangeTo" name="column[][to]"
+                               pattern="\d*"
+                               value="{{ column.column_to }}" required>
+                    </div>
+                    {# Order input & Delete btn #}
+                    <div class="form-group col-md-3">
+                        <label>Order</label>
+                        <div class="form-row">
+                            {# Order #}
+                            <div class="col">
+                                <input type="text" class="form-control" id="inputColumnOrder" name="column[][order]"
+                                       pattern="\d*"
+                                       value="{{ column.column_order }}" required>
+                            </div>
+                            {# Delete #}
+                            <div class="col">
+                                <button type="button" class="btn btn-link text-danger" id="btnDeleteColumn">Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </form>
+    {# Add Column block #}
+    <div class="w-75 mx-lg-5 mx-auto pl-3 pt-4 pb-3 mb-5 mt-4 d-flex flex-column border">
+        <form id="formApend">
+            {# Add Column inputs #}
+            <div id="columnRow" class="form-row">
+                {# Name input #}
+                <div class="form-group col-md-4">
+                    <label>Column name</label>
+                    <input type="text" class="form-control" id="inputColumnName" name="name" value="" required>
+                </div>
+                {# Type select #}
+                <div class="form-group col-md-3">
+                    <label>Type</label>
+                    <div class="input-group">
+                        <select class="custom-select" id="inputColumnType" name="type" required>
+                            <option value="" selected disabled hidden>-----</option>
+                            {% for type in template_column.CHOISES_COLUMN_TYPES %}
+                                <option value="{{ type|first }}">
+                                    {{ type|last }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {# Range input. Visible only for Integer #}
+                {# From input #}
+                <div class="form-group col-md-1 invisible">
+                    <label>From</label>
+                    <input type="text" class="form-control" id="inputColumnRangeFrom" name="from" pattern="\d*"
+                           value="0" required>
+                </div>
+                {# To input #}
+                <div class="form-group col-md-1 invisible">
+                    <label>To</label>
+                    <input type="text" class="form-control" id="inputColumnRangeTo" name="to" pattern="\d*"
+                           value="0" required>
+                </div>
+                {# Order input & Delete btn #}
+                <div class="form-group col-md-3">
+                    <label>Order</label>
+                    <div class="form-row">
+                        {# Order input #}
+                        <div class="col">
+                            <input type="text" class="form-control" id="inputColumnOrder" name="order" pattern="\d*"
+                                   value="">
+                        </div>
+                        {# Delete button #}
+                        <div class="col">
+                            <button type="button" class="btn btn-link text-danger" id="btnClearColumn">Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {# Submit button #}
+            <button class="btn btn-primary"
+                    type="submit">
+                Add column
+            </button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'workspace/js/work_with_schema.js' %}"></script>
+    <script type="text/template" data-template="appendColumn">
+        <div id="columnRow" class="form-row new-col">
+            {# Name input #}
+            <div class="form-group col-md-4">
+                <label>Column name</label>
+                <input type="text" class="form-control" id="inputColumnName" name="column[][name]"
+                       value="" required>
+            </div>
+            {# Type select #}
+            <div class="form-group col-md-3">
+                <label>Type</label>
+                <div class="input-group">
+                    <select class="custom-select" id="inputColumnType" name="column[][type]" required>
+                        {% for type in template_column.CHOISES_COLUMN_TYPES %}
+                            <option value="{{ type|first }}">
+                                {{ type|last }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            {# Range input. Visible only for Integer #}
+            {# From input #}
+            <div class="form-group col-md-1">
+                <label>From</label>
+                <input type="text" class="form-control" id="inputColumnRangeFrom" name="column[][from]"
+                       pattern="\d*" value="" required>
+            </div>
+            {# To input #}
+            <div class="form-group col-md-1">
+                <label>To</label>
+                <input type="text" class="form-control" id="inputColumnRangeTo" name="column[][to]"
+                       pattern="\d*" value="" required>
+            </div>
+            {# Order input & Delete btn #}
+            <div class="form-group col-md-3">
+                <label>Order</label>
+                <div class="form-row">
+                    {# Order input #}
+                    <div class="col">
+                        <input type="text" class="form-control" id="inputColumnOrder" name="column[][order]"
+                               pattern="\d*"
+                               value="" required>
+                    </div>
+                    {# Delete button #}
+                    <div class="col">
+                        <button type="button" class="btn btn-link text-danger" id="btnDeleteColumn">Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{# templates/registration/login.html #}
+{% extends 'base.html' %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block body %}
+    <main class="h-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex flex-column align-items-center justify-content-center border border-1 w-50">
+            <form class="form-signin w-50 d-flex flex-column" method="post">
+                {% csrf_token %}
+                <label class="form-label align-self-center h2 my-5">Login</label>
+                <input class="form-control mb-3 " type="text" placeholder="Username" name="username">
+                <input class="form-control  mb-3 " type="password" placeholder="Password" name="password">
+                <input class="btn btn-primary align-self-end mb-5" type="submit" value="Login">
+                <label class="form-label align-self-center mb-5"></label>
+            </form>
+        </div>
+    </main>
+{% endblock %}

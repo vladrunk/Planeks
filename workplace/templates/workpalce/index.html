@@ -1,0 +1,77 @@
+{# workplace/templates/workpalce/index.html #}
+{% extends 'base.html' %}{% load static %}
+
+{% block title %}FakeCSV{% endblock %}
+
+{% block body %}
+    {% include 'nav.html' %}
+    {# New schemas page #}
+    <div class="w-75 mx-lg-5 mx-auto d-flex flex-column mt-5">
+        {# Data schemas Title & Button #}
+        <div class="d-flex flex-row mb-3">
+            {# Data schemas title #}
+            <span class="mr-auto me-auto h4">Data schemas</span>
+            {# New schemas button #}
+            <a class="btn btn-success" href="{% url 'new_schema' %}">
+                New schema
+            </a>
+        </div>
+        {# Data schemas Table #}
+        <table class="table table-bordered align-self-center">
+            {# Table Head #}
+            <thead>
+            <tr class="font-weight-bold">
+                <th scope="row">#</th>
+                <td colspan="1">Title</td>
+                <td colspan="1">Modified</td>
+                <td colspan="2">Actions</td>
+            </tr>
+            </thead>
+            {# Table Body #}
+            <tbody>
+            {# Table Generator #}
+            {% for schema in schemas %}
+                <tr>
+                    {# Table Collumn Index #}
+                    <th scope="row" class="align-middle">{{ forloop.counter }}</th>
+                    {# Table Collumn Title #}
+                    <td colspan="1" class="align-middle">
+                        <div>
+                            <a class="" href="{% url 'schema' schema.pk %}" id="btnOpenSchema">
+                                <input type="button" class="btn btn-link"
+                                       value="{{ schema.schema_name }}">
+                                <a href="" class="d-none"></a>
+                            </a>
+                        </div>
+                    </td>
+                    {# Table Collumn Modified #}
+                    <td colspan="1" class="align-middle">{{ schema.date_edit|date:"Y-m-d" }}</td>
+                    {# Table Collumn Actions #}
+                    <td colspan="2" class="align-middle">
+                        <div>
+                            <a href="{% url 'edit_schema' schema.pk %}" class="float-left text-decoration-none"
+                               id="btnEditSchema">
+                                <input type="button" class="btn btn-link" value="Edit schema">
+                                <a href="" class="d-none"></a>
+                            </a>
+                        </div>
+                        <div>
+                            <a href="{% url 'delete_schema' schema.pk %}" class="text-decoration-none"
+                               id="btnDeleteSchema">
+                                <input type="button" class="ml-lg-3 btn btn-link text-danger"
+                                       value="Delete">
+                                <a href="" class="d-none"></a>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{% static 'workspace/js/index.js' %}"></script>
+{% endblock %}
