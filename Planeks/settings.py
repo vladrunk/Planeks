@@ -12,7 +12,7 @@ SECRET_KEY = 'DEBUG-+q=8f=)x&0_vmmb%tf_ykb_cemy7u)51tcea-3gimedtwevfny'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
