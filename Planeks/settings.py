@@ -8,9 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_REDIRECT_URL = 'workpalce'
 LOGOUT_REDIRECT_URL = 'workpalce'
 
-SECRET_KEY = ''
+SECRET_KEY = 'DEBUG-+q=8f=)x&0_vmmb%tf_ykb_cemy7u)51tcea-3gimedtwevfny'
 
-DEBUG = 0
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
