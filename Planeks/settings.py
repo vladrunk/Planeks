@@ -1,3 +1,5 @@
+import os
+
 import django_heroku
 from pathlib import Path
 
@@ -6,14 +8,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_REDIRECT_URL = 'workpalce'
 LOGOUT_REDIRECT_URL = 'workpalce'
 
-SECRET_KEY = 'g+iqrxfz##))9)h(gswmy7(mam31e-ee+=!yh9q@7qi*ts4z$('
+SECRET_KEY = ''
 
-DEBUG = True
+DEBUG = 0
 
-if DEBUG:
-    ALLOWED_HOSTS = ['*', ]
-else:
-    ALLOWED_HOSTS = ['*', ]
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,8 +39,7 @@ ROOT_URLCONF = 'Planeks.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,12 +82,14 @@ STATICFILES_DIRS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
-# REDIS related settings
-REDIS_HOST = 'localhost'
-REDIS_PORT = '6379'
-BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
-
-# django_heroku.settings(locals())
-
+if DEBUG:
+    # REDIS related settings
+    REDIS_HOST = 'localhost'
+    REDIS_PORT = '6379'
+    BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+    BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+    CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+else:
+    django_heroku.settings(locals())
+    BROKER_URL = os.environ['REDIS_URL']
+    CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
