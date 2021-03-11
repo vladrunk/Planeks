@@ -10,7 +10,7 @@ LOGOUT_REDIRECT_URL = 'workpalce'
 
 SECRET_KEY = ''
 
-DEBUG = 0
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
