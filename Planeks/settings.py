@@ -11,7 +11,7 @@ LOGOUT_REDIRECT_URL = 'workpalce'
 
 SECRET_KEY = 'DEBUG-+q=8f=)x&0_vmmb%tf_ykb_cemy7u)51tcea-3gimedtwevfny'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -91,7 +91,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
 if DEBUG:
-    # REDIS related settings
     CELERY_REDIS_HOST = 'localhost'
     CELERY_REDIS_PORT = '6379'
     CELERY_BROKER_URL = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'

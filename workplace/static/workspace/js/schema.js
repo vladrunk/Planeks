@@ -4,7 +4,7 @@ $(document).ready(() => {
 	axios.defaults.xsrfCookieName = 'csrftoken';
 	axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 	
-	const interval = 15;
+	const interval = 10;
 	
 	const handleChangeNumsRow = (e) => {
 		const nums = $(e.target);
@@ -19,22 +19,30 @@ $(document).ready(() => {
 		const tr = tb.children().last();
 		const trc = $($('script[data-template="appendTableRow"]').html().trim()).clone();
 		const nums_row = tr.find('#index').text();
+		
 		trc.attr('task_id', task_id);
 		trc.children('#index').text((nums_row ? +nums_row : 0) + 1);
 		trc.find('#date_created').text((new Date()).toISOString().split('T') [0]);
 		trc.find('#status').text('Processing');
+		
 		tb.append(trc);
 	};
-	const handleSuccessCreateDataSet = (tasks, urls) => {
+	const handleSuccessCreateDataSet = (tasks, datasets) => {
 		tasks.forEach((task_id) => {
 			const tr = $('tr[task_id=' + task_id + ']');
+			
 			const elem_status = tr.find('#status');
 			elem_status.removeClass('badge-secondary');
 			elem_status.addClass('badge-success');
 			elem_status.text('Ready');
-			const elem_download = tr.find('#download');
+			
+			const elem_download = tr.find('#btnDownload');
 			elem_download.removeClass('d-none');
-			elem_download.attr('href', urls[task_id]);
+			elem_download.click(handleClickBtnDownload);
+			
+			const elem_ds_id = tr.find('#datasetId');
+			elem_ds_id.text(datasets[task_id]);
+			
 			tr.removeAttr('task_id');
 		})
 	};
@@ -63,6 +71,53 @@ $(document).ready(() => {
 				});
 		}
 	};
+	const handleClickBtnDownload = (e) => {
+		const btn = e.target;
+		const a = btn.previousElementSibling;
+		const dataset_id = a.innerText;
+		const url = a.href;
+		axios
+			.get(url, {
+				params: {
+					dataset_id: dataset_id,
+				}
+			})
+			.then(response => {
+				handleSuccessDownload(response.data.content_b64)
+			})
+			.catch(error => {
+				console.log(error.data.message)
+			})
+		
+	};
+	const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
+		const byteCharacters = atob(b64Data);
+		const byteArrays = [];
+		
+		for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+			const slice = byteCharacters.slice(offset, offset + sliceSize);
+			
+			const byteNumbers = new Array(slice.length);
+			for (let i = 0; i < slice.length; i++) {
+				byteNumbers[i] = slice.charCodeAt(i);
+			}
+			
+			const byteArray = new Uint8Array(byteNumbers);
+			byteArrays.push(byteArray);
+		}
+		
+		return new Blob(byteArrays, {type: contentType});
+	}
+	const handleSuccessDownload = (b64Data) => {
+		const contentType = 'text/csv';
+		const blob = b64toBlob(b64Data, contentType);
+		const blobUrl = URL.createObjectURL(blob);
+		let link = document.createElement('a');
+		link.download = 'dataset.csv';
+		link.href = blobUrl;
+		link.click();
+		URL.revokeObjectURL(link.href);
+	};
 	
 	setInterval(getTaskStatus, interval * 1000);
 	
@@ -81,5 +136,8 @@ $(document).ready(() => {
 		}).catch(error => {
 			handleErrorCreateDataSet();
 		}).then(() => btnGenerateData.prop('disabled', false));
+	});
+	$('button#btnDownload').each((i, el) => {
+		$(el).click(handleClickBtnDownload);
 	});
 });

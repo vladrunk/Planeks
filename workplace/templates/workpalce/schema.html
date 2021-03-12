@@ -58,12 +58,11 @@
                     </td>
                     {# Table Collumn Actions #}
                     <td class="align-middle" colspan="2">
-                        <a class="link-primary"
-                           id="download"
-                           href="{% get_media_prefix %}{{ dataset.file.name }}"
-                           download="dataset">
+                        <a href="{% url 'download_dataset' %}" class="d-none" id="datasetId"
+                           download="dataset.csv">{{ dataset.pk }}</a>
+                        <button class="btn btn-link" id="btnDownload">
                             Download
-                        </a>
+                        </button>
                     </td>
                 </tr>
             {% endfor %}
@@ -89,13 +88,11 @@
             </td>
             {# Table Collumn Actions #}
             <td class="align-middle" colspan="2">
-                <a class="link-primary d-none"
-                   id="download"
-                   href="{% get_media_prefix %}{{ dataset.file.name }}"
-                   download="dataset"
-                >
+                <a href="{% url 'download_dataset' %}" class="d-none" id="datasetId" download="dataset.csv"></a>
+                <button class="btn btn-link d-none"
+                        id="btnDownload">
                     Download
-                </a>
+                </button>
             </td>
         </tr>
 

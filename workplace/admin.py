@@ -28,7 +28,7 @@ class ColumnAdmin(admin.ModelAdmin):
 
 @admin.register(DataSet)
 class DataSetAdmin(admin.ModelAdmin):
-    list_display = ['id', 'schema', 'date_create', 'file', ]
+    list_display = ['id', 'schema', 'date_create', 'file_content', ]
 
     def get_field_queryset(self, db, db_field, request):
         return db_field.remote_field.model.objects.filter(user=request.user)
