@@ -7,6 +7,7 @@ urlpatterns = [
     path('schema/<int:schema_id>', schema, name='schema'),
     path('generate_data/<int:schema_id>', generate_data, name='generate_data'),
     path('check_generate_data', check_generate_data_status, name='check_generate_data_status'),
+    path('download_dataset', download_dataset, name='download_dataset'),
     path('new_schema', new_schema, name='new_schema'),
     path('edit_schema/<int:schema_id>', edit_schema, name='edit_schema'),
     path('submit_schema', submit_schema, name='submit_new_schema'),

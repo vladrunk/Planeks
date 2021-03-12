@@ -1,14 +1,23 @@
 # workplace\views.py
+import json
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Schema, Column
-
-import os
-import json
-
+from .models import Schema, Column, DataSet
 from .tasks import generate_data_task, app
+
+
+def get_schema_from_db(*args, **kwargs):
+    bad_response = JsonResponse({'status': 'error',
+                                 'message': 'The scheme does not exist.',
+                                 }, status=500)
+    try:
+        _schema = Schema.objects.get(*args, **kwargs)
+    except ObjectDoesNotExist:
+        return False, bad_response
+    return True, _schema
 
 
 @login_required()
@@ -89,15 +98,8 @@ def delete_schema(request, schema_id):
     if not exist_schema:
         return _schema
 
-    if _schema.schema_datasets.all().count() > 0:
-        dir_path = get_file_path(_schema.schema_datasets.all())
-        for dataset in _schema.schema_datasets.all():
-            dataset.file.delete()
-        try:
-            os.removedirs(dir_path)
-        except FileNotFoundError:
-            pass
     _schema.delete()
+
     return JsonResponse({'status': 'deleted',
                          'schema_id': schema_id,
                          }, status=200)
@@ -144,21 +146,16 @@ def check_generate_data_status(request):
         return JsonResponse({'message': f'Not allowed request method – {request.method}.'}, status=500)
 
 
-def get_schema_from_db(*args, **kwargs):
-    bad_response = JsonResponse({'status': 'error',
-                                 'message': 'The scheme does not exist.',
-                                 }, status=500)
-    try:
-        _schema = Schema.objects.get(*args, **kwargs)
-    except ObjectDoesNotExist:
-        return False, bad_response
-    return True, _schema
-
-
-def get_file_path(datasets):
-    for dataset in datasets:
+@login_required()
+def download_dataset(request):
+    if request.method == 'GET':
+        dataset_id = request.GET.get('dataset_id')
         try:
-            return dataset.file.path.rsplit('\\', 1)[0]
-        except ValueError:
-            continue
-    return ''
+            dataset = DataSet.objects.get(schema__user=request.user, pk=dataset_id)
+        except ObjectDoesNotExist:
+            return JsonResponse({'message': f'Does not find Dataset. User: {request.user}, DataSet id: {dataset_id}.'},
+                                status=500)
+        res = {'content_b64': dataset.file_content}
+        return JsonResponse(res, status=200)
+    else:
+        return JsonResponse({'message': f'Not allowed request method – {request.method}.'}, status=500)
