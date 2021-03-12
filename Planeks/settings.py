@@ -55,16 +55,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Planeks.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'planeks',
-#         'USER': 'godbd',
-#         'PASSWORD': 'Answer42!',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432',
-#     }
-# }
 DATABASES = {'default': dj_database_url.config(conn_max_age=600)}
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -95,6 +85,6 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 # CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 # CELERY_RESULT_BACKEND = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
 
-BROKER_URL = os.environ['REDIS_URL']
+CELERY_BROKER_URL = os.environ['REDIS_URL']
 CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
 django_heroku.settings(locals())
