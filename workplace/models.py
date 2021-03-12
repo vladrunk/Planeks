@@ -4,9 +4,6 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 
-from nanoid import generate
-from string import ascii_letters, digits
-
 
 class Schema(models.Model):
     CHOISES_COLUMN_SEPARATOR = [
@@ -113,12 +110,6 @@ class Column(models.Model):
         return f'{self.schema.schema_name} {self.column_name}'
 
 
-def user_directory_path(instance, filename):
-    name, ext = filename.split('.')
-    filename = f'{name}_{generate(ascii_letters[:] + digits[:], 10)}.{ext}'
-    return f'user_{instance.schema.user.id}/schema_{instance.schema.id}/{filename}'
-
-
 class DataSet(models.Model):
     schema = models.ForeignKey(
         to=Schema,
@@ -129,8 +120,7 @@ class DataSet(models.Model):
     date_create = models.DateTimeField(
         auto_now=True,
     )
-    file = models.FileField(
-        upload_to=user_directory_path,
+    file_content = models.TextField(
         default=None,
         null=True,
         blank=True,
@@ -138,4 +128,3 @@ class DataSet(models.Model):
 
     def __str__(self):
         return f'{self.schema.schema_name} — {self.date_create}'
-
