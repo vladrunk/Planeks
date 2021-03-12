@@ -10,7 +10,7 @@ LOGOUT_REDIRECT_URL = 'workpalce'
 
 SECRET_KEY = 'DEBUG-+q=8f=)x&0_vmmb%tf_ykb_cemy7u)51tcea-3gimedtwevfny'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -56,8 +56,12 @@ WSGI_APPLICATION = 'Planeks.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'planeks',
+        'USER': 'godbd',
+        'PASSWORD': 'Answer42!',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -84,11 +88,11 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 
 if DEBUG:
     # REDIS related settings
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = '6379'
-    BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
-    BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-    CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+    CELERY_REDIS_HOST = 'localhost'
+    CELERY_REDIS_PORT = '6379'
+    CELERY_BROKER_URL = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
+    CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+    CELERY_RESULT_BACKEND = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
 else:
     django_heroku.settings(locals())
     BROKER_URL = os.environ['REDIS_URL']
