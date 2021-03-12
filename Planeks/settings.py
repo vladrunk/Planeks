@@ -11,7 +11,7 @@ LOGOUT_REDIRECT_URL = 'workpalce'
 
 SECRET_KEY = 'DEBUG-+q=8f=)x&0_vmmb%tf_ykb_cemy7u)51tcea-3gimedtwevfny'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -88,14 +88,13 @@ STATICFILES_DIRS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
-if DEBUG:
-    # REDIS related settings
-    CELERY_REDIS_HOST = 'localhost'
-    CELERY_REDIS_PORT = '6379'
-    CELERY_BROKER_URL = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
-    CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-    CELERY_RESULT_BACKEND = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
-else:
-    BROKER_URL = os.environ['REDIS_URL']
-    CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
-    django_heroku.settings(locals())
+# REDIS related settings
+# CELERY_REDIS_HOST = 'localhost'
+# CELERY_REDIS_PORT = '6379'
+# CELERY_BROKER_URL = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
+# CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+# CELERY_RESULT_BACKEND = 'redis://' + CELERY_REDIS_HOST + ':' + CELERY_REDIS_PORT + '/0'
+
+BROKER_URL = os.environ['REDIS_URL']
+CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
+django_heroku.settings(locals())
