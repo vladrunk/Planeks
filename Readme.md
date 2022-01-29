@@ -1,6 +1,9 @@
 ## Создайте онлайн-сервис для генерации CSV-файлов с поддельными (фиктивными) данными с помощью Python и Django:
 
-[Доступы для демо](https://t.me/vladrunk)
+Доступы для демо   
+user: `test`   
+pass: `42`   
+
 
 - Любой пользователь может войти в систему под своим именем пользователя и паролем.
 - Вы можете использовать общие представления, предоставляемые Django для реализации этих возможностей. Достаточно зарегистрировать новых пользователей через интерфейс администратора.  Обратите внимание, что вам не нужно реализовывать интерфейс пользовательского профиля для поддержки смены пароля. 
@@ -26,4 +29,18 @@
 - Завершенное приложение должно быть развернуто в Heroku и доступно в режиме онлайн (должен поддерживаться HTTPS).  Пожалуйста, создайте тестового пользователя и предоставьте нам учетные данные.
 - Исходный код должен быть зафиксирован в репозитории на GitHub, Bitbucket или GitLab.
 
+*Note*   
 Запуск Celery на windows `celery -A Planeks worker --pool=solo -l info`
+
+---
+## Code review: 
+## Pros:
+- Heroku deployment
+- Main functionality works well
+- Interesting solution with storing CSV content in the database instead of using S3 or so. Not a convenient way but it works for this particular project.
+- Using 3rd party API - https://www.mockaroo.com/ . Pretty workable solution.
+- Refreshing task status during file generation.
+- Admin interface is configured.
+### Cons:
+- Hardcoded settings
+- Hardcoded Mockaroo API key in the code
